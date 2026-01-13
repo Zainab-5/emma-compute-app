@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Computation {
+  id        String   @id @default(cuid())
+  a         Float
+  b         Float
+  status    String   @default("pending")
+  progress  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  jobs      Job[]
+}
+
+model Job {
+  id             String       @id @default(cuid())
+  computationId  String
+  operation      String
+  result         Float?
+  status         String       @default("pending")
+  error          String?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  
+  computation    Computation  @relation(fields: [computationId], references: [id], onDelete: Cascade)
+  
+  @@index([computationId])
+}
